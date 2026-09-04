@@ -1206,4 +1206,13 @@ cat /tmp/top10_youtube_opencode.json 2>&1 | python3 -m json.tool | head -n 20
 
 ---
 
+## 10. WAVE-порт из ai-harness 0bcf729427 (YouTube 3-layer + HARD RULE + POT fail-soft)
+
+Портировано из `ai-harness@0bcf729427` (validate 055 PASS). Файлы — в `docs/wave-port/`, без значений кук/токенов.
+
+- **HARD RULE — YouTube watch-URL → yt-transcript only:** `watch?v=` / `youtu.be/` / `shorts/` → `node .opencode/bin/yt-transcript.cjs --format text` (Stage1 transcript_api → Stage2 write-sub → Stage3 tiny). `crawl4ai_extract` для watch-URL запрещён (JS/bot-wall → empty/NaN). См. `docs/wave-port/youtube-chain.md`, `docs/wave-port/search-router-SKILL.md`.
+- **Zero-download 3-layer stack:** Stage-0 Gemini YouTube-URL batch-10 first (public only) → Stage-1 Supadata fallback → Stage-2 NotebookLM шарды ≤50 (reject: видео младше 72ч, корпус >500K слов). mp3 — только last resort с warn про бан. См. `docs/wave-port/youtube-SKILL.md`.
+- **POT fail-soft:** POT/BGUTIL `:4416` — explicitly OPTIONAL. Нет провайдера (нет генератора, нет токена) — цепь идёт без POT-аргументов, без шума коннектов. SearXNG только `:8080`. См. `docs/wave-port/yt-transcript.cjs` (`getPotArgs`), `docs/wave-port/extract.sh` (subtitle-first, cookie reuse без значений).
+- **Пруфы:** канон — SearXNG health `:8080` + yt-transcript 1239 entries; `/tmp` эфемерен, пруфы хранить в `research/` или `docs/`. См. `docs/wave-port/harness-proof.md`.
+
 *WebStack — one-prompt portable. Для OpenCode, но легко в Hermes/Pi/DeepSeek. 0 рублей, 10M free Jina, 756M Whisper, host-mode SearXNG 29-31. Скопируй промпт из секции 9 — и готово.*
